@@ -1,1 +1,5 @@
-/recSend
+sport_env/
+Videos/
+__pycache__/
+*.pyc
+.env
