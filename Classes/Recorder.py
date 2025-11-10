@@ -1,6 +1,8 @@
 import cv2
 from collections import deque
 from datetime import datetime 
+import os
+#import pigpio
 
 class Recorder:
     # O método construtor agora inicializa os atributos privados.
@@ -21,6 +23,12 @@ class Recorder:
         self._ip_address = ip_address
         self._cam_height = cam_height
         self._cam_width = cam_width
+        self._path = path
+        if not os.path.exists(path):
+            print("Diretório não encontrado. Criando...")
+            os.makedirs(path)
+        else:
+            print("Diretório já existe.")
         self._path = path
         # Corrigindo o f-string para a mensagem de criação
         print(f"Um {self.__class__.__name__} foi criado na localização: {self._location}!")
@@ -43,6 +51,10 @@ class Recorder:
     def get_cam_width(self):
         """Retorna a largura da câmera em pixels."""
         return self._cam_width
+    
+    def get_path(self):
+        """Retorna a localização do gravador."""
+        return self._path
 
     # --- Métodos SET (Modificadores) ---
     # Usados para alterar o valor dos atributos privados, com validação.
@@ -95,7 +107,7 @@ class Recorder:
 
             print("Pronto para gravar... Pressione 'r' para começar a gravar os últimos 15 segundos.")
             print("Pressione 'q' para sair.")
-
+            counter = 1
             while True:
                 ret, current_frame = cap.read()
                 if not ret:
@@ -111,9 +123,12 @@ class Recorder:
                 # Verifica a entrada do usuário
                 key = cv2.waitKey(1) & 0xFF
                 
-                if key == ord('r'):
+                if key == ord('r') or ((counter % (self.window_width)) == 0):
+                        if((counter % (self.window_width)) == 0):
+                            counter = 0
                         print("Iniciando gravação...")
-                        title = datetime.now().strftime("%d_%m_%Y_%H_%M_%S.mp4")
+                        title = self.get_path()+datetime.now().strftime("%d_%m_%Y_%H_%M_%S.mp4")
+                        print("Salvando em:", title)
                         
                         # Cria o objeto VideoWriter aqui
                         out = cv2.VideoWriter(title, fourcc, float(self.frame), (self.get_cam_width(), self.get_cam_height()))
@@ -124,6 +139,9 @@ class Recorder:
                             out.write(buffered_frame)
                         
                         out.release()
+                counter += 1
+                
+
         except Exception as e:
             print("Erro: ", e)            
         finally:            
@@ -136,6 +154,7 @@ class Recorder:
         print("Iniciando gravação...")
         fourcc = cv2.VideoWriter_fourcc(*'avc1')
         title = self.path+datetime.now().strftime("%d_%m_%Y_%H_%M_%S.mp4")
+        print("Salvando em:", title)
         
         # Cria o objeto VideoWriter aqui
         out = cv2.VideoWriter(title, fourcc, float(self.frame), (self._cam_width, self._cam_height))

@@ -78,10 +78,12 @@ def list_videos():
                 
             # 4. Se passou nos filtros, adicione à lista
             filtered_files.append(filename)
+            num_videos = len(filtered_files)
+            print(f"Arquivo adicionado: {filename}. Total até agora: {num_videos}")
             
         # 5. Retorna a lista filtrada e ordenada como JSON
         filtered_files.sort()
-        return jsonify(filtered_files)
+        return jsonify({"total_videos": num_videos, "videos": filtered_files} )
         
     except FileNotFoundError:
         return jsonify({"error": "Diretório 'Videos' não encontrado."}), 404
