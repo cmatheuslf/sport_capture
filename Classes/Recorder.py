@@ -89,13 +89,13 @@ class Recorder:
             print("Erro: A largura deve ser um número inteiro maior que zero.")
 
     # Captura de Vídeo
-    def streaming_video(self):
+    def streaming_video(self, codec, containerv):
         try:
             # Inicializa a captura de vídeo (0 = primeira câmera conectada)
             cap = cv2.VideoCapture(0)
 
             # Define o codec e o objeto VideoWriter
-            fourcc = cv2.VideoWriter_fourcc(*'avc1') # avc1 = h264
+            fourcc = cv2.VideoWriter_fourcc(*codec) # avc1 = h264
             # Note: o VideoWriter deve ser criado apenas quando a gravação começar
             # para garantir que o arquivo seja aberto e fechado corretamente.
             # out = cv2.VideoWriter('output.mp4', fourcc, float(frame), (640, 480))
@@ -127,7 +127,7 @@ class Recorder:
                         if((counter % (self.window_width)) == 0):
                             counter = 0
                         print("Iniciando gravação...")
-                        title = self.get_path()+datetime.now().strftime("%d_%m_%Y_%H_%M_%S.mp4")
+                        title = self.get_path()+datetime.now().strftime("%d_%m_%Y_%H_%M_%S")+containerv
                         print("Salvando em:", title)
                         
                         # Cria o objeto VideoWriter aqui
